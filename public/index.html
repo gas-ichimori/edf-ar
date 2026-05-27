@@ -602,7 +602,7 @@ function drawAnt(cw, ch) {
   ctx.save();
   ctx.translate(antX, antY - antH / 2 + bob);
   ctx.rotate(tilt);
-  if (antVx < 0) ctx.scale(-1, 1);
+  if (antVx > 0) ctx.scale(-1, 1);
   ctx.drawImage(antImg, -antW / 2, -antH / 2, antW, antH);
   ctx.restore();
 }
