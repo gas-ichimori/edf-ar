@@ -799,7 +799,7 @@ $('btn-share').addEventListener('click', async () => {
   const file = new File([capturedBlob], 'edf-ar.jpg', { type: 'image/jpeg' });
   try {
     if (navigator.share && navigator.canShare({ files: [file] })) {
-      await navigator.share({ files: [file], title: 'D3PUBLISHER INC -EDF AR- TGS2026', text: 'D3PUBLISHER TGS2026ブース ※HALL ※※番号 へ緊急出動せよ！ 巨大生物襲来！急げ！EDF！EDF！EDF！ #地球防衛軍 #ディースリー・パブリッシャー #東京ゲームショウ' });
+      await navigator.share({ files: [file], title: 'D3PUBLISHER INC -EDF AR- TGS2026', text: 'D3PUBLISHER TGS2026ブース ※HALL ※※番号 へ緊急出動せよ！ 🎁特別物資を提供中🎁 巨大生物襲来！仲間と共に急げ！EDF！EDF！EDF！ #地球防衛軍 #ディースリー・パブリッシャー #東京ゲームショウ' });
     } else { downloadPhoto(); }
   } catch (e) { if (e.name !== 'AbortError') downloadPhoto(); }
 });
