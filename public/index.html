@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>EDF AR</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+1p:wght@800&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  width: 100%; height: 100%;
+  overflow: hidden;
+  background: #000;
+  font-family: 'M PLUS 1p', sans-serif;
+  font-weight: 800;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+/* ── START SCREEN ── */
+#start-screen {
+  position: fixed; inset: 0;
+  background: #07100a;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 32px; z-index: 100;
+}
+#start-screen h1 {
+  font-size: 18px; letter-spacing: 5px; color: #c8a832;
+  text-align: center; line-height: 1.8;
+}
+#start-screen p {
+  font-size: 13px; color: rgba(223,240,208,0.7);
+  text-align: center; letter-spacing: 1px; line-height: 1.9;
+}
+#btn-start {
+  padding: 16px 40px;
+  background: rgba(50,110,28,0.8);
+  border: 2px solid #c8a832;
+  border-radius: 40px;
+  color: #fff; font-size: 15px; letter-spacing: 3px;
+  font-family: inherit; font-weight: 800;
+  cursor: pointer;
+}
+#btn-start:active { opacity: 0.75; }
+
+/* ── AR VIEW ── */
+#ar-view {
+  position: fixed; inset: 0;
+  display: none;
+}
+
+#viewfinder {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+}
+
+/* frame overlay drawn via CSS img — transparent center */
+#frame-overlay {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  z-index: 10;
+  display: none; /* shown after load */
+}
+
+/* HUD top bar */
+#hud-top {
+  position: absolute; top: 0; left: 0; right: 0;
+  padding: 16px 20px;
+  display: flex; justify-content: space-between; align-items: center;
+  z-index: 20;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.55), transparent);
+}
+.hud-tag {
+  font-size: 10px; letter-spacing: 3px; color: #88ff55;
+}
+.hud-rec {
+  font-size: 10px; letter-spacing: 2px; color: #ff4444;
+  animation: blink 1.2s infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+
+/* HUD bottom */
+#hud-bottom {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  padding: 0 0 48px;
+  display: flex; flex-direction: column;
+  align-items: center; gap: 18px;
+  z-index: 20;
+  background: linear-gradient(to top, rgba(0,0,0,0.5), transparent);
+}
+.hud-hint {
+  font-size: 11px; letter-spacing: 2px;
+  color: rgba(200,240,160,0.8);
+}
+#btn-capture {
+  width: 72px; height: 72px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  border: 3px solid rgba(255,255,255,0.8);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+#btn-capture:active { transform: scale(0.9); }
+#btn-capture::after {
+  content: '';
+  width: 52px; height: 52px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.9);
+}
+
+/* flash */
+#flash {
+  position: fixed; inset: 0;
+  background: #fff;
+  opacity: 0; pointer-events: none;
+  z-index: 200;
+  transition: opacity 0.05s;
+}
+#flash.on { opacity: 1; }
+
+/* ── RESULT SCREEN ── */
+#result-screen {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.92);
+  display: none;
+  flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 20px; z-index: 150;
+  padding: 24px;
+}
+#captured-img {
+  width: 100%;
+  max-width: 360px;
+  max-height: 60vh;
+  object-fit: contain;
+  border: 2px solid rgba(200,168,50,0.5);
+  border-radius: 12px;
+}
+.result-label {
+  font-size: 11px; letter-spacing: 3px; color: #c8a832;
+}
+.result-btns {
+  display: flex; gap: 14px; width: 100%; max-width: 360px;
+}
+.result-btns button {
+  flex: 1; padding: 15px 0;
+  border-radius: 40px;
+  font-family: inherit; font-weight: 800;
+  font-size: 13px; letter-spacing: 2px;
+  cursor: pointer;
+  border: 2px solid;
+}
+#btn-share {
+  background: rgba(50,110,28,0.85);
+  border-color: #c8a832; color: #fff;
+}
+#btn-retake {
+  background: transparent;
+  border-color: rgba(200,168,50,0.4); color: #c8a832;
+}
+#btn-save {
+  background: rgba(20,60,80,0.85);
+  border-color: rgba(100,200,255,0.5); color: #aef;
+  font-size: 11px;
+}
+</style>
+</head>
+<body>
+
+<!-- START -->
+<div id="start-screen">
+  <h1>— EDF AR —<br>巨大蟻出現</h1>
+  <p>カメラを起動して<br>巨大蟻を出現させよう。<br>EDF！</p>
+  <button id="btn-start">📷　カメラを起動する</button>
+</div>
+
+<!-- AR VIEW -->
+<div id="ar-view">
+  <canvas id="viewfinder"></canvas>
+  <img id="frame-overlay" src="/frame.png" alt="">
+
+  <div id="hud-top">
+    <span class="hud-tag">EDF // AR MODE</span>
+    <span class="hud-rec">● REC</span>
+  </div>
+
+  <div id="hud-bottom">
+    <span class="hud-hint">タップして撮影</span>
+    <div id="btn-capture"></div>
+  </div>
+</div>
+
+<!-- FLASH -->
+<div id="flash"></div>
+
+<!-- RESULT -->
+<div id="result-screen">
+  <span class="result-label">撮影完了</span>
+  <img id="captured-img" alt="撮影した写真">
+  <div class="result-btns">
+    <button id="btn-share">📤 シェア</button>
+    <button id="btn-save">⬇️ 保存</button>
+    <button id="btn-retake">↩ 撮り直す</button>
+  </div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+
+const canvas    = $('viewfinder');
+const ctx       = canvas.getContext('2d');
+const frameImg  = $('frame-overlay');
+
+let video, antImg, frameCanvas;
+let animT = 0;
+let rafId  = null;
+let antLoaded = false;
+let frameLoaded = false;
+let capturedBlob = null;
+
+// ── Ant animation state ──
+const ant = {
+  x: 0, y: 0,       // set on first frame
+  vx: 0.4,          // walking direction
+  scale: 1,
+  angle: 0,
+};
+
+// ── Load images ──
+antImg = new Image();
+antImg.onload  = () => { antLoaded = true; };
+antImg.onerror = () => { antLoaded = false; };
+antImg.src = '/ant.png';
+
+const frameImage = new Image();
+frameImage.onload  = () => { frameLoaded = true; frameImg.style.display = 'block'; };
+frameImage.onerror = () => { frameLoaded = false; };
+frameImage.src = '/frame.png';
+
+// ── Start button ──
+$('btn-start').addEventListener('click', startAR);
+
+async function startAR() {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } },
+      audio: false
+    });
+    video = document.createElement('video');
+    video.srcObject = stream;
+    video.setAttribute('playsinline', '');
+    video.muted = true;
+    await video.play();
+    video.addEventListener('loadedmetadata', () => {
+      resizeCanvas();
+      $('start-screen').style.display = 'none';
+      $('ar-view').style.display = 'block';
+      ant.x = canvas.width  * 0.5;
+      ant.y = canvas.height * 0.62;
+      rafId = requestAnimationFrame(renderLoop);
+    });
+  } catch(e) {
+    alert('カメラの起動に失敗しました。\nブラウザのカメラ許可を確認してください。');
+  }
+}
+
+function resizeCanvas() {
+  canvas.width  = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+
+// ── Main render loop ──
+function renderLoop() {
+  rafId = requestAnimationFrame(renderLoop);
+  resizeCanvas();
+
+  const cw = canvas.width, ch = canvas.height;
+
+  // Camera feed (cover-fit)
+  if (video && video.readyState >= 2) {
+    const vw = video.videoWidth, vh = video.videoHeight;
+    const scale = Math.max(cw / vw, ch / vh);
+    const ox = (cw - vw * scale) / 2;
+    const oy = (ch - vh * scale) / 2;
+    ctx.drawImage(video, ox, oy, vw * scale, vh * scale);
+  } else {
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, 0, cw, ch);
+  }
+
+  // Ant
+  if (antLoaded) drawAnt(cw, ch);
+
+  // Frame overlay
+  if (frameLoaded) {
+    ctx.drawImage(frameImage, 0, 0, cw, ch);
+  }
+}
+
+function drawAnt(cw, ch) {
+  animT += 0.018;
+
+  // Walk left-right, bounce off edges
+  ant.x += ant.vx * 1.2;
+  const antW = cw * 0.55;
+  const antH = antW * (antImg.naturalHeight / antImg.naturalWidth);
+  const margin = antW * 0.3;
+  if (ant.x - antW / 2 < margin) { ant.x = margin + antW / 2; ant.vx = Math.abs(ant.vx); }
+  if (ant.x + antW / 2 > cw - margin) { ant.x = cw - margin - antW / 2; ant.vx = -Math.abs(ant.vx); }
+
+  // Subtle bobbing
+  const bob  = Math.sin(animT * 4.0) * 3.5;
+  const tilt = Math.sin(animT * 4.0) * 0.025;
+
+  // Ground shadow
+  ctx.save();
+  ctx.globalAlpha = 0.25;
+  ctx.filter = 'blur(12px)';
+  ctx.fillStyle = '#000';
+  ctx.beginPath();
+  ctx.ellipse(ant.x, ant.y + antH * 0.48, antW * 0.38, antH * 0.07, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+
+  // Ant sprite (flip when walking left)
+  ctx.save();
+  ctx.translate(ant.x, ant.y + bob);
+  ctx.rotate(tilt);
+  if (ant.vx < 0) ctx.scale(-1, 1);
+  ctx.drawImage(antImg, -antW / 2, -antH / 2, antW, antH);
+  ctx.restore();
+}
+
+// ── Capture ──
+$('btn-capture').addEventListener('click', capture);
+
+function capture() {
+  // Flash
+  const flash = $('flash');
+  flash.classList.add('on');
+  setTimeout(() => flash.classList.remove('on'), 120);
+
+  // Pause render briefly, capture canvas
+  cancelAnimationFrame(rafId);
+
+  canvas.toBlob(blob => {
+    capturedBlob = blob;
+    const url = URL.createObjectURL(blob);
+    $('captured-img').src = url;
+    $('ar-view').style.display = 'none';
+    $('result-screen').style.display = 'flex';
+  }, 'image/jpeg', 0.92);
+}
+
+// ── Share ──
+$('btn-share').addEventListener('click', async () => {
+  if (!capturedBlob) return;
+  const file = new File([capturedBlob], 'edf-ar.jpg', { type: 'image/jpeg' });
+  try {
+    if (navigator.share && navigator.canShare({ files: [file] })) {
+      await navigator.share({
+        files: [file],
+        title: 'EDF AR 巨大蟻出現',
+        text: 'EDF！EDF！EDF！ #EDF #地球防衛軍 #TGS2026',
+      });
+    } else {
+      downloadPhoto();
+    }
+  } catch(e) {
+    if (e.name !== 'AbortError') downloadPhoto();
+  }
+});
+
+// ── Save ──
+$('btn-save').addEventListener('click', downloadPhoto);
+
+function downloadPhoto() {
+  if (!capturedBlob) return;
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(capturedBlob);
+  a.download = 'edf-ar.jpg';
+  a.click();
+}
+
+// ── Retake ──
+$('btn-retake').addEventListener('click', () => {
+  $('result-screen').style.display = 'none';
+  $('ar-view').style.display = 'block';
+  ant.x = canvas.width  * 0.5;
+  ant.y = canvas.height * 0.62;
+  rafId = requestAnimationFrame(renderLoop);
+});
+</script>
+</body>
+</html>

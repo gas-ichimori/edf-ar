@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: edf-ar
+    env: node
+    region: singapore
+    buildCommand: npm install
+    startCommand: npm start
