@@ -352,11 +352,23 @@ const ANT_CRUSH_MS   = 1500;
 $('btn-start').addEventListener('click', startAR);
 
 async function startAR() {
+  let stream;
   try {
-    const stream = await navigator.mediaDevices.getUserMedia({
+    // まず背面カメラを試みる
+    stream = await navigator.mediaDevices.getUserMedia({
       video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } },
       audio: false,
     });
+  } catch (e1) {
+    try {
+      // 失敗したら制約なしで再試行（Android互換）
+      stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+    } catch (e2) {
+      alert('カメラの起動に失敗しました。\n\n【対処方法】\nブラウザの設定 → サイトの設定 → カメラ → このサイトを「許可」に変更してください。\n\n(' + e2.message + ')');
+      return;
+    }
+  }
+  try {
     video = $('bg-video');
     video.srcObject = stream;
     await video.play();
@@ -380,7 +392,7 @@ async function startAR() {
       setTimeout(() => { if (appState !== 'scanning') return; proceed(); }, 1500);
     }
   } catch (e) {
-    alert('カメラの起動に失敗しました。\nカメラの許可を確認してください。\n\n' + e.message);
+    alert('カメラの起動に失敗しました。\n\n' + e.message);
   }
 }
 
