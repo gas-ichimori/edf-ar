@@ -46,27 +46,22 @@ html, body {
 #btn-start:active { opacity: 0.75; }
 
 /* ── AR VIEW ── */
-#ar-view {
-  position: fixed; inset: 0;
-  display: none;
-}
+#ar-view { position: fixed; inset: 0; display: none; }
 
 #viewfinder {
   position: absolute; inset: 0;
   width: 100%; height: 100%;
-  object-fit: cover;
 }
 
-/* frame overlay drawn via CSS img — transparent center */
 #frame-overlay {
   position: absolute; inset: 0;
   width: 100%; height: 100%;
   pointer-events: none;
   z-index: 10;
-  display: none; /* shown after load */
+  display: none;
 }
 
-/* HUD top bar */
+/* HUD top */
 #hud-top {
   position: absolute; top: 0; left: 0; right: 0;
   padding: 16px 20px;
@@ -74,28 +69,24 @@ html, body {
   z-index: 20;
   background: linear-gradient(to bottom, rgba(0,0,0,0.55), transparent);
 }
-.hud-tag {
-  font-size: 10px; letter-spacing: 3px; color: #88ff55;
-}
+.hud-tag { font-size: 10px; letter-spacing: 3px; color: #88ff55; }
 .hud-rec {
   font-size: 10px; letter-spacing: 2px; color: #ff4444;
   animation: blink 1.2s infinite;
 }
 @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
 
-/* HUD bottom */
+/* HUD bottom — capture button */
 #hud-bottom {
   position: absolute; bottom: 0; left: 0; right: 0;
   padding: 0 0 48px;
-  display: flex; flex-direction: column;
+  display: none; /* shown only when ant is placed */
+  flex-direction: column;
   align-items: center; gap: 18px;
   z-index: 20;
   background: linear-gradient(to top, rgba(0,0,0,0.5), transparent);
 }
-.hud-hint {
-  font-size: 11px; letter-spacing: 2px;
-  color: rgba(200,240,160,0.8);
-}
+.hud-hint { font-size: 11px; letter-spacing: 2px; color: rgba(200,240,160,0.8); }
 #btn-capture {
   width: 72px; height: 72px;
   border-radius: 50%;
@@ -113,7 +104,18 @@ html, body {
   background: rgba(255,255,255,0.9);
 }
 
-/* flash */
+/* Scan hint */
+#scan-hint {
+  position: absolute; bottom: 48px; left: 0; right: 0;
+  text-align: center;
+  font-size: 11px; letter-spacing: 1.5px;
+  color: rgba(200,240,160,0.8);
+  z-index: 20;
+  pointer-events: none;
+  line-height: 2;
+}
+
+/* Flash */
 #flash {
   position: fixed; inset: 0;
   background: #fff;
@@ -134,56 +136,36 @@ html, body {
   padding: 24px;
 }
 #captured-img {
-  width: 100%;
-  max-width: 360px;
-  max-height: 60vh;
+  width: 100%; max-width: 360px; max-height: 60vh;
   object-fit: contain;
   border: 2px solid rgba(200,168,50,0.5);
   border-radius: 12px;
 }
-.result-label {
-  font-size: 11px; letter-spacing: 3px; color: #c8a832;
-}
-.result-btns {
-  display: flex; gap: 14px; width: 100%; max-width: 360px;
-}
+.result-label { font-size: 11px; letter-spacing: 3px; color: #c8a832; }
+.result-btns { display: flex; gap: 14px; width: 100%; max-width: 360px; }
 .result-btns button {
   flex: 1; padding: 15px 0;
   border-radius: 40px;
   font-family: inherit; font-weight: 800;
   font-size: 13px; letter-spacing: 2px;
-  cursor: pointer;
-  border: 2px solid;
+  cursor: pointer; border: 2px solid;
 }
-#btn-share {
-  background: rgba(50,110,28,0.85);
-  border-color: #c8a832; color: #fff;
-}
-#btn-retake {
-  background: transparent;
-  border-color: rgba(200,168,50,0.4); color: #c8a832;
-}
-#btn-save {
-  background: rgba(20,60,80,0.85);
-  border-color: rgba(100,200,255,0.5); color: #aef;
-  font-size: 11px;
-}
+#btn-share { background: rgba(50,110,28,0.85); border-color: #c8a832; color: #fff; }
+#btn-retake { background: transparent; border-color: rgba(200,168,50,0.4); color: #c8a832; }
+#btn-save { background: rgba(20,60,80,0.85); border-color: rgba(100,200,255,0.5); color: #aef; font-size: 11px; }
 </style>
 </head>
 <body>
 
-<!-- START -->
 <div id="start-screen">
   <h1>— EDF AR —<br>巨大蟻出現</h1>
-  <p>カメラを起動して<br>巨大蟻を出現させよう。<br>EDF！</p>
+  <p>カメラを起動して地面を認識させると<br>巨大蟻が出現します。<br>EDF！</p>
   <button id="btn-start">📷　カメラを起動する</button>
 </div>
 
-<!-- hidden video element for iOS Safari compatibility -->
 <video id="bg-video" playsinline webkit-playsinline muted
   style="position:fixed;opacity:0;pointer-events:none;width:1px;height:1px;top:0;left:0;"></video>
 
-<!-- AR VIEW -->
 <div id="ar-view">
   <canvas id="viewfinder"></canvas>
   <img id="frame-overlay" src="/frame.png" alt="">
@@ -193,16 +175,18 @@ html, body {
     <span class="hud-rec">● REC</span>
   </div>
 
+  <div id="scan-hint">
+    スマートフォンを地面に向けて<br>静止させてください
+  </div>
+
   <div id="hud-bottom">
     <span class="hud-hint">タップして撮影</span>
     <div id="btn-capture"></div>
   </div>
 </div>
 
-<!-- FLASH -->
 <div id="flash"></div>
 
-<!-- RESULT -->
 <div id="result-screen">
   <span class="result-label">撮影完了</span>
   <img id="captured-img" alt="撮影した写真">
@@ -216,56 +200,68 @@ html, body {
 <script>
 const $ = id => document.getElementById(id);
 
-const canvas    = $('viewfinder');
-const ctx       = canvas.getContext('2d');
-const frameImg  = $('frame-overlay');
+const canvas = $('viewfinder');
+const ctx    = canvas.getContext('2d');
 
-let video, antImg, frameCanvas;
-let animT = 0;
+// ── App state machine ──
+// 'scanning' → 'stabilizing' → 'placing' → 'placed'
+let appState = 'scanning';
+
+// ── Motion detection ──
+const REQUIRED_STILL  = 2200; // ms of stillness needed
+const MOTION_THRESH   = 0.28; // acceleration change threshold
+let stillDuration = 0;
+let lastAccel     = { x: 0, y: 0, z: 0 };
+let lastMotionMs  = 0;
+
+// ── Placement animation ──
+const PLACING_DURATION = 900; // ms
+let placingStartTime = 0;
+
+// ── Ant walk ──
+let antX = 0, antY = 0, antVx = 0.55;
+
+// ── Animation timer ──
+let animT  = 0;
 let rafId  = null;
-let antLoaded = false;
-let frameLoaded = false;
+let video  = null;
 let capturedBlob = null;
 
-// ── Ant animation state ──
-const ant = {
-  x: 0, y: 0,       // set on first frame
-  vx: 0.4,          // walking direction
-  scale: 1,
-  angle: 0,
-};
+// ── Ground indicator anchor (set when stabilised) ──
+let groundCX = 0, groundCY = 0;
 
-// ── Load images ──
-antImg = new Image();
-antImg.onload  = () => { antLoaded = true; };
-antImg.onerror = () => { antLoaded = false; };
-antImg.src = '/ant.png';
+// ── Images ──
+const antImg   = new Image(); let antLoaded   = false;
+const frameImg = new Image(); let frameLoaded = false;
+antImg.onload   = () => { antLoaded   = true; };
+frameImg.onload = () => { frameLoaded = true; $('frame-overlay').style.display = 'block'; };
+antImg.src   = '/ant.png';
+frameImg.src = '/frame.png';
 
-const frameImage = new Image();
-frameImage.onload  = () => { frameLoaded = true; frameImg.style.display = 'block'; };
-frameImage.onerror = () => { frameLoaded = false; };
-frameImage.src = '/frame.png';
-
-// ── Start button ──
+// ────────────────────────────────────────
+//  START
+// ────────────────────────────────────────
 $('btn-start').addEventListener('click', startAR);
 
 async function startAR() {
   try {
     const stream = await navigator.mediaDevices.getUserMedia({
       video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } },
-      audio: false
+      audio: false,
     });
     video = $('bg-video');
     video.srcObject = stream;
     await video.play();
 
+    // iOS: request motion sensor permission (must be inside user gesture)
+    await setupMotion();
+
     const proceed = () => {
       resizeCanvas();
       window.addEventListener('resize', resizeCanvas);
+      appState = 'scanning';
       $('start-screen').style.display = 'none';
       $('ar-view').style.display = 'block';
-      ant.x = canvas.width  * 0.5;
-      ant.y = canvas.height * 0.62;
       rafId = requestAnimationFrame(renderLoop);
     };
 
@@ -273,13 +269,78 @@ async function startAR() {
       proceed();
     } else {
       video.addEventListener('loadedmetadata', proceed, { once: true });
-      setTimeout(() => {
-        if ($('start-screen').style.display !== 'none') proceed();
-      }, 1500);
+      setTimeout(() => { if (appState !== 'scanning') return; proceed(); }, 1500);
     }
-  } catch(e) {
-    alert('カメラの起動に失敗しました。\nブラウザのカメラ許可を確認してください。\n\n' + e.message);
+  } catch (e) {
+    alert('カメラの起動に失敗しました。\nカメラの許可を確認してください。\n\n' + e.message);
   }
+}
+
+async function setupMotion() {
+  if (typeof DeviceMotionEvent === 'undefined') {
+    autoFallback();
+    return;
+  }
+  if (typeof DeviceMotionEvent.requestPermission === 'function') {
+    try {
+      const result = await DeviceMotionEvent.requestPermission();
+      if (result === 'granted') {
+        window.addEventListener('devicemotion', onMotion);
+      } else {
+        autoFallback();
+      }
+    } catch {
+      autoFallback();
+    }
+  } else {
+    window.addEventListener('devicemotion', onMotion);
+    // safety net: if no events fire within 3s, fall back
+    setTimeout(() => { if (appState === 'scanning') autoFallback(); }, 3000);
+  }
+}
+
+function autoFallback() {
+  // Auto-place after 3.5 seconds for environments without motion sensor
+  setTimeout(() => triggerPlacement(), 3500);
+}
+
+function onMotion(e) {
+  if (appState !== 'scanning' && appState !== 'stabilizing') return;
+
+  const acc = e.acceleration || e.accelerationIncludingGravity;
+  if (!acc || acc.x === null) return;
+
+  const now = Date.now();
+  const dt  = Math.min(now - (lastMotionMs || now), 80);
+  lastMotionMs = now;
+
+  const ax = acc.x || 0, ay = acc.y || 0, az = acc.z || 0;
+  const delta = Math.sqrt(
+    Math.pow(ax - lastAccel.x, 2) +
+    Math.pow(ay - lastAccel.y, 2) +
+    Math.pow(az - lastAccel.z, 2)
+  );
+  lastAccel = { x: ax, y: ay, z: az };
+
+  if (delta < MOTION_THRESH) {
+    stillDuration += dt;
+    if (appState === 'scanning' && stillDuration > 350) appState = 'stabilizing';
+    if (stillDuration >= REQUIRED_STILL) triggerPlacement();
+  } else {
+    stillDuration = Math.max(0, stillDuration - dt * 2);
+    if (appState === 'stabilizing' && stillDuration < 100) appState = 'scanning';
+  }
+}
+
+function triggerPlacement() {
+  if (appState === 'placing' || appState === 'placed') return;
+  const cw = canvas.width, ch = canvas.height;
+  groundCX = cw / 2;
+  groundCY = ch * 0.68;
+  antX = groundCX;
+  antY = groundCY;
+  placingStartTime = Date.now();
+  appState = 'placing';
 }
 
 function resizeCanvas() {
@@ -287,87 +348,252 @@ function resizeCanvas() {
   canvas.height = window.innerHeight;
 }
 
-// ── Main render loop ──
+// ────────────────────────────────────────
+//  RENDER LOOP
+// ────────────────────────────────────────
 function renderLoop() {
   rafId = requestAnimationFrame(renderLoop);
+  animT += 0.018;
 
   const cw = canvas.width, ch = canvas.height;
 
-  // Camera feed (cover-fit)
+  // Camera
   if (video && video.readyState >= 2) {
     const vw = video.videoWidth, vh = video.videoHeight;
-    const scale = Math.max(cw / vw, ch / vh);
-    const ox = (cw - vw * scale) / 2;
-    const oy = (ch - vh * scale) / 2;
-    ctx.drawImage(video, ox, oy, vw * scale, vh * scale);
+    const s  = Math.max(cw / vw, ch / vh);
+    ctx.drawImage(video, (cw - vw * s) / 2, (ch - vh * s) / 2, vw * s, vh * s);
   } else {
     ctx.fillStyle = '#000';
     ctx.fillRect(0, 0, cw, ch);
   }
 
-  // Ant
-  if (antLoaded) drawAnt(cw, ch);
-
-  // Frame overlay
-  if (frameLoaded) {
-    ctx.drawImage(frameImage, 0, 0, cw, ch);
+  switch (appState) {
+    case 'scanning':
+    case 'stabilizing':
+      drawScanIndicator(cw, ch);
+      $('scan-hint').style.display = 'block';
+      $('hud-bottom').style.display = 'none';
+      break;
+    case 'placing':
+      drawPlacing(cw, ch);
+      $('scan-hint').style.display = 'none';
+      $('hud-bottom').style.display = 'none';
+      break;
+    case 'placed':
+      drawAnt(cw, ch);
+      $('scan-hint').style.display = 'none';
+      $('hud-bottom').style.display = 'flex';
+      break;
   }
+
+  if (frameLoaded) ctx.drawImage(frameImg, 0, 0, cw, ch);
 }
 
-function drawAnt(cw, ch) {
-  animT += 0.018;
+// ────────────────────────────────────────
+//  SCAN INDICATOR
+// ────────────────────────────────────────
+function drawScanIndicator(cw, ch) {
+  const cx = cw / 2;
+  const cy = ch * 0.68;
+  const gw = cw * 0.52;
+  const gh = ch * 0.075;
 
-  // Walk left-right, bounce off edges
-  ant.x += ant.vx * 1.2;
-  const antW = cw * 0.55;
+  const isStab    = appState === 'stabilizing';
+  const progress  = Math.min(stillDuration / REQUIRED_STILL, 1);
+  const color     = isStab ? '#88ff55' : '#c8a832';
+  const pulse     = 0.65 + Math.sin(animT * 3.2) * 0.2;
+
+  // Trapezoid corners (perspective ground plane)
+  const tl = { x: cx - gw * 0.33, y: cy - gh };
+  const tr = { x: cx + gw * 0.33, y: cy - gh };
+  const br = { x: cx + gw * 0.5,  y: cy };
+  const bl = { x: cx - gw * 0.5,  y: cy };
+
+  ctx.save();
+
+  // Green glow fill when stabilising
+  if (isStab) {
+    ctx.beginPath();
+    ctx.moveTo(tl.x, tl.y); ctx.lineTo(tr.x, tr.y);
+    ctx.lineTo(br.x, br.y); ctx.lineTo(bl.x, bl.y);
+    ctx.closePath();
+    ctx.fillStyle = `rgba(136,255,85,${0.05 + 0.08 * progress})`;
+    ctx.fill();
+  }
+
+  // Grid lines inside trapezoid
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(tl.x, tl.y); ctx.lineTo(tr.x, tr.y);
+  ctx.lineTo(br.x, br.y); ctx.lineTo(bl.x, bl.y);
+  ctx.closePath();
+  ctx.clip();
+  ctx.strokeStyle = color;
+  ctx.globalAlpha = 0.28;
+  ctx.lineWidth = 0.8;
+  // Horizontal lines
+  for (let i = 0; i <= 3; i++) {
+    const t  = i / 3;
+    const y  = tl.y + (bl.y - tl.y) * t;
+    const xl = tl.x + (bl.x - tl.x) * t;
+    const xr = tr.x + (br.x - tr.x) * t;
+    ctx.beginPath(); ctx.moveTo(xl, y); ctx.lineTo(xr, y); ctx.stroke();
+  }
+  // Vertical lines (perspective-aware)
+  for (let i = 0; i <= 5; i++) {
+    const t  = i / 5;
+    const xt = tl.x + (tr.x - tl.x) * t;
+    const xb = bl.x + (br.x - bl.x) * t;
+    ctx.beginPath(); ctx.moveTo(xt, tl.y); ctx.lineTo(xb, bl.y); ctx.stroke();
+  }
+  ctx.restore();
+
+  // Outline
+  ctx.beginPath();
+  ctx.moveTo(tl.x, tl.y); ctx.lineTo(tr.x, tr.y);
+  ctx.lineTo(br.x, br.y); ctx.lineTo(bl.x, bl.y);
+  ctx.closePath();
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 1.5;
+  ctx.globalAlpha = pulse;
+  ctx.stroke();
+
+  // Corner brackets
+  const bLen = 14;
+  const corners = [
+    { p: tl, dx:  1, dy:  1 },
+    { p: tr, dx: -1, dy:  1 },
+    { p: br, dx: -1, dy: -1 },
+    { p: bl, dx:  1, dy: -1 },
+  ];
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 2.5;
+  ctx.globalAlpha = 0.95;
+  corners.forEach(({ p, dx, dy }) => {
+    ctx.beginPath();
+    ctx.moveTo(p.x + dx * bLen, p.y);
+    ctx.lineTo(p.x, p.y);
+    ctx.lineTo(p.x, p.y + dy * bLen);
+    ctx.stroke();
+  });
+
+  // Sweep line (animates top→bottom)
+  const sweepT  = (animT * 0.75) % 1;
+  const sweepY  = tl.y + (bl.y - tl.y) * sweepT;
+  const sweepXl = tl.x + (bl.x - tl.x) * sweepT;
+  const sweepXr = tr.x + (br.x - tr.x) * sweepT;
+  ctx.beginPath();
+  ctx.moveTo(sweepXl, sweepY);
+  ctx.lineTo(sweepXr, sweepY);
+  ctx.strokeStyle = isStab ? '#88ff55' : '#fff';
+  ctx.lineWidth = 1.5;
+  ctx.globalAlpha = 0.55 * (1 - sweepT);
+  ctx.stroke();
+
+  // Status text
+  ctx.font = 'bold 11px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillStyle = color;
+  ctx.globalAlpha = 0.95;
+  ctx.fillText(isStab ? 'SURFACE DETECTED' : 'SCANNING...', cx, cy + 22);
+
+  // Progress bar
+  if (isStab && progress > 0) {
+    const bw = gw * 0.65;
+    const bx = cx - bw / 2;
+    const by = cy + 33;
+    ctx.fillStyle = 'rgba(255,255,255,0.15)';
+    ctx.fillRect(bx, by, bw, 3);
+    ctx.fillStyle = '#88ff55';
+    ctx.globalAlpha = 0.9;
+    ctx.fillRect(bx, by, bw * progress, 3);
+  }
+
+  ctx.restore();
+}
+
+// ────────────────────────────────────────
+//  PLACING ANIMATION
+// ────────────────────────────────────────
+function drawPlacing(cw, ch) {
+  const elapsed = Date.now() - placingStartTime;
+  const p = Math.min(elapsed / PLACING_DURATION, 1);
+  if (p >= 1) { appState = 'placed'; return; }
+
+  // Ease out cubic
+  const ease = 1 - Math.pow(1 - p, 3);
+
+  // Ripple ring
+  const rp = Math.min(elapsed / 500, 1);
+  ctx.save();
+  ctx.beginPath();
+  ctx.ellipse(groundCX, groundCY, cw * 0.28 * rp, ch * 0.035 * rp, 0, 0, Math.PI * 2);
+  ctx.strokeStyle = '#88ff55';
+  ctx.lineWidth = 2;
+  ctx.globalAlpha = (1 - rp) * 0.9;
+  ctx.stroke();
+  ctx.restore();
+
+  if (!antLoaded) return;
+
+  const antW = cw * 0.55 * ease;
   const antH = antW * (antImg.naturalHeight / antImg.naturalWidth);
-  const margin = antW * 0.3;
-  if (ant.x - antW / 2 < margin) { ant.x = margin + antW / 2; ant.vx = Math.abs(ant.vx); }
-  if (ant.x + antW / 2 > cw - margin) { ant.x = cw - margin - antW / 2; ant.vx = -Math.abs(ant.vx); }
 
-  // Subtle bobbing
+  ctx.save();
+  ctx.globalAlpha = Math.min(ease * 1.5, 1);
+  ctx.drawImage(antImg, groundCX - antW / 2, groundCY - antH, antW, antH);
+  ctx.restore();
+}
+
+// ────────────────────────────────────────
+//  ANT WALK
+// ────────────────────────────────────────
+function drawAnt(cw, ch) {
+  if (!antLoaded) return;
+
+  const antW  = cw * 0.55;
+  const antH  = antW * (antImg.naturalHeight / antImg.naturalWidth);
+  const margin = antW * 0.3;
+
+  antX += antVx;
+  if (antX - antW / 2 < margin)      { antX = margin + antW / 2;      antVx =  Math.abs(antVx); }
+  if (antX + antW / 2 > cw - margin) { antX = cw - margin - antW / 2; antVx = -Math.abs(antVx); }
+
   const bob  = Math.sin(animT * 4.0) * 3.5;
   const tilt = Math.sin(animT * 4.0) * 0.025;
 
-  // Ground shadow
+  // Shadow
   ctx.save();
   ctx.globalAlpha = 0.25;
   ctx.filter = 'blur(12px)';
   ctx.fillStyle = '#000';
   ctx.beginPath();
-  ctx.ellipse(ant.x, ant.y + antH * 0.48, antW * 0.38, antH * 0.07, 0, 0, Math.PI * 2);
+  ctx.ellipse(antX, antY + antH * 0.04, antW * 0.38, antH * 0.055, 0, 0, Math.PI * 2);
   ctx.fill();
   ctx.restore();
 
-  // Ant sprite (flip when walking left)
   ctx.save();
-  ctx.translate(ant.x, ant.y + bob);
+  ctx.translate(antX, antY - antH / 2 + bob);
   ctx.rotate(tilt);
-  if (ant.vx < 0) ctx.scale(-1, 1);
+  if (antVx < 0) ctx.scale(-1, 1);
   ctx.drawImage(antImg, -antW / 2, -antH / 2, antW, antH);
   ctx.restore();
 }
 
-// ── Capture ──
-$('btn-capture').addEventListener('click', capture);
-
-function capture() {
-  // Flash
-  const flash = $('flash');
-  flash.classList.add('on');
-  setTimeout(() => flash.classList.remove('on'), 120);
-
-  // Pause render briefly, capture canvas
+// ────────────────────────────────────────
+//  CAPTURE
+// ────────────────────────────────────────
+$('btn-capture').addEventListener('click', () => {
+  $('flash').classList.add('on');
+  setTimeout(() => $('flash').classList.remove('on'), 120);
   cancelAnimationFrame(rafId);
-
   canvas.toBlob(blob => {
     capturedBlob = blob;
-    const url = URL.createObjectURL(blob);
-    $('captured-img').src = url;
+    $('captured-img').src = URL.createObjectURL(blob);
     $('ar-view').style.display = 'none';
     $('result-screen').style.display = 'flex';
   }, 'image/jpeg', 0.92);
-}
+});
 
 // ── Share ──
 $('btn-share').addEventListener('click', async () => {
@@ -375,22 +601,13 @@ $('btn-share').addEventListener('click', async () => {
   const file = new File([capturedBlob], 'edf-ar.jpg', { type: 'image/jpeg' });
   try {
     if (navigator.share && navigator.canShare({ files: [file] })) {
-      await navigator.share({
-        files: [file],
-        title: 'EDF AR 巨大蟻出現',
-        text: 'EDF！EDF！EDF！ #EDF #地球防衛軍 #TGS2026',
-      });
-    } else {
-      downloadPhoto();
-    }
-  } catch(e) {
-    if (e.name !== 'AbortError') downloadPhoto();
-  }
+      await navigator.share({ files: [file], title: 'EDF AR 巨大蟻出現', text: 'EDF！EDF！EDF！ #EDF #地球防衛軍 #TGS2026' });
+    } else { downloadPhoto(); }
+  } catch (e) { if (e.name !== 'AbortError') downloadPhoto(); }
 });
 
 // ── Save ──
 $('btn-save').addEventListener('click', downloadPhoto);
-
 function downloadPhoto() {
   if (!capturedBlob) return;
   const a = document.createElement('a');
@@ -401,10 +618,10 @@ function downloadPhoto() {
 
 // ── Retake ──
 $('btn-retake').addEventListener('click', () => {
+  appState = 'scanning';
+  stillDuration = 0;
   $('result-screen').style.display = 'none';
   $('ar-view').style.display = 'block';
-  ant.x = canvas.width  * 0.5;
-  ant.y = canvas.height * 0.62;
   rafId = requestAnimationFrame(renderLoop);
 });
 </script>
