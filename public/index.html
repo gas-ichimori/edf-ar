@@ -31,6 +31,13 @@ html, body {
   position: absolute; inset: 0;
   background: rgba(0,0,0,0.45);
 }
+#start-copyright {
+  position: absolute; bottom: 20px; left: 0; right: 0;
+  text-align: center;
+  font-size: 10px; letter-spacing: 1px;
+  color: rgba(255,255,255,0.5);
+  z-index: 1;
+}
 #start-screen h1, #start-screen p, #btn-start {
   position: relative; z-index: 1;
 }
@@ -229,6 +236,7 @@ html, body {
     <span class="btn-ja">カメラ起動</span>
     <span class="btn-en">ACTIVATE CAMERA</span>
   </button>
+  <p id="start-copyright">© D3PUBLISHER INC. All rights reserved.</p>
 </div>
 
 <video id="bg-video" playsinline webkit-playsinline muted
@@ -515,6 +523,14 @@ function renderLoop() {
   }
 
   if (frameLoaded) ctx.drawImage(frameImg, 0, 0, cw, ch);
+
+  // Copyright
+  ctx.save();
+  ctx.font = '10px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillStyle = 'rgba(255,255,255,0.45)';
+  ctx.fillText('© D3PUBLISHER INC. All rights reserved.', cw / 2, ch - 10);
+  ctx.restore();
 }
 
 // ────────────────────────────────────────
