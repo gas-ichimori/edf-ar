@@ -35,23 +35,46 @@ html, body {
   position: relative; z-index: 1;
 }
 #start-screen h1 {
-  font-size: 18px; letter-spacing: 5px; color: #c8a832;
-  text-align: center; line-height: 1.8;
-  text-shadow: 0 2px 12px rgba(0,0,0,0.8);
+  font-size: 22px; letter-spacing: 6px; color: #c8a832;
+  text-align: center; line-height: 1.6;
+  text-shadow: 0 2px 16px rgba(0,0,0,0.9);
 }
+#start-screen h1 small {
+  display: block;
+  font-size: 11px; letter-spacing: 3px; color: #ff4444;
+  margin-top: 6px;
+  text-shadow: 0 0 10px rgba(255,60,60,0.7);
+  animation: blink-warn 1.4s infinite;
+}
+@keyframes blink-warn { 0%,100%{opacity:1} 50%{opacity:0.5} }
 #start-screen p {
-  font-size: 13px; color: rgba(223,240,208,0.9);
-  text-align: center; letter-spacing: 1px; line-height: 1.9;
+  font-size: 13px; color: rgba(223,240,208,0.95);
+  text-align: center; letter-spacing: 1px; line-height: 2.0;
   text-shadow: 0 1px 8px rgba(0,0,0,0.9);
 }
+#start-screen p small {
+  display: block;
+  font-size: 10px; letter-spacing: 2px; color: rgba(200,168,50,0.8);
+  margin-top: 4px;
+}
 #btn-start {
-  padding: 16px 40px;
-  background: rgba(50,110,28,0.8);
+  display: flex; flex-direction: column;
+  align-items: center; gap: 6px;
+  padding: 18px 44px;
+  background: rgba(50,110,28,0.85);
   border: 2px solid #c8a832;
-  border-radius: 40px;
-  color: #fff; font-size: 15px; letter-spacing: 3px;
-  font-family: inherit; font-weight: 800;
-  cursor: pointer;
+  border-radius: 14px;
+  color: #fff; font-family: inherit; font-weight: 800;
+  cursor: pointer; position: relative; z-index: 1;
+}
+#btn-start img {
+  width: 36px; height: 36px; object-fit: contain;
+}
+#btn-start .btn-ja {
+  font-size: 16px; letter-spacing: 4px;
+}
+#btn-start .btn-en {
+  font-size: 9px; letter-spacing: 3px; color: rgba(200,240,160,0.8);
 }
 #btn-start:active { opacity: 0.75; }
 
@@ -168,9 +191,13 @@ html, body {
 <body>
 
 <div id="start-screen">
-  <h1>— EDF AR —<br>巨大蟻出現</h1>
-  <p>カメラを起動して地面を認識させると<br>巨大蟻が出現します。<br>EDF！</p>
-  <button id="btn-start">📷　カメラを起動する</button>
+  <h1>巨大蟻出現<small>⚠ WARNING: GIANT ANTS DETECTED</small></h1>
+  <p>カメラを起動して地面を認識させろ！<small>ACTIVATE CAMERA. SCAN THE GROUND.</small></p>
+  <button id="btn-start">
+    <img src="/mark.png" alt="">
+    <span class="btn-ja">カメラ起動</span>
+    <span class="btn-en">ACTIVATE CAMERA</span>
+  </button>
 </div>
 
 <video id="bg-video" playsinline webkit-playsinline muted
