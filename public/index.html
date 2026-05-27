@@ -179,6 +179,10 @@ html, body {
   <button id="btn-start">📷　カメラを起動する</button>
 </div>
 
+<!-- hidden video element for iOS Safari compatibility -->
+<video id="bg-video" playsinline webkit-playsinline muted
+  style="position:fixed;opacity:0;pointer-events:none;width:1px;height:1px;top:0;left:0;"></video>
+
 <!-- AR VIEW -->
 <div id="ar-view">
   <canvas id="viewfinder"></canvas>
@@ -251,21 +255,30 @@ async function startAR() {
       video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } },
       audio: false
     });
-    video = document.createElement('video');
+    video = $('bg-video');
     video.srcObject = stream;
-    video.setAttribute('playsinline', '');
-    video.muted = true;
     await video.play();
-    video.addEventListener('loadedmetadata', () => {
+
+    const proceed = () => {
       resizeCanvas();
+      window.addEventListener('resize', resizeCanvas);
       $('start-screen').style.display = 'none';
       $('ar-view').style.display = 'block';
       ant.x = canvas.width  * 0.5;
       ant.y = canvas.height * 0.62;
       rafId = requestAnimationFrame(renderLoop);
-    });
+    };
+
+    if (video.videoWidth > 0) {
+      proceed();
+    } else {
+      video.addEventListener('loadedmetadata', proceed, { once: true });
+      setTimeout(() => {
+        if ($('start-screen').style.display !== 'none') proceed();
+      }, 1500);
+    }
   } catch(e) {
-    alert('カメラの起動に失敗しました。\nブラウザのカメラ許可を確認してください。');
+    alert('カメラの起動に失敗しました。\nブラウザのカメラ許可を確認してください。\n\n' + e.message);
   }
 }
 
@@ -277,7 +290,6 @@ function resizeCanvas() {
 // ── Main render loop ──
 function renderLoop() {
   rafId = requestAnimationFrame(renderLoop);
-  resizeCanvas();
 
   const cw = canvas.width, ch = canvas.height;
 
