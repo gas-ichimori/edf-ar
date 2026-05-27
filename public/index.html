@@ -259,11 +259,21 @@ const antFrontImg = new Image(); let antFrontLoaded = false;
 antFrontImg.onload = () => { antFrontLoaded = true; };
 antFrontImg.src = '/ant_front.png';
 
+// ── Crush frame ──
+const antCrushImg = new Image(); let antCrushLoaded = false;
+antCrushImg.onload = () => { antCrushLoaded = true; };
+antCrushImg.src = '/ant_crush.png';
+
 // ── Turning state ──
 let antTurning       = false;
 let antTurnStartTime = 0;
 let antPendingVx     = 0;
 const ANT_TURN_MS    = 420;
+
+// ── Crush state ──
+let antCrushed       = false;
+let antCrushStartTime = 0;
+const ANT_CRUSH_MS   = 1500;
 
 // ────────────────────────────────────────
 //  START
@@ -610,17 +620,26 @@ function drawAnt(cw, ch) {
     }
   }
 
-  // Choose image: front while turning, walking frames otherwise
+  // Crush timer
+  if (antCrushed && Date.now() - antCrushStartTime >= ANT_CRUSH_MS) {
+    antCrushed  = false;
+    antTurning  = false;
+    antVx       = antPendingVx;
+  }
+
+  // Choose image
   let drawImg;
-  if (antTurning && antFrontLoaded) {
+  if (antCrushed && antCrushLoaded) {
+    drawImg = antCrushImg;
+  } else if (antTurning && antFrontLoaded) {
     drawImg = antFrontImg;
   } else {
     advanceAntFrame();
     drawImg = antImg;
   }
 
-  const bob  = antTurning ? 0 : Math.sin(animT * 4.0) * 3.5;
-  const tilt = antTurning ? 0 : Math.sin(animT * 4.0) * 0.025;
+  const bob  = (antTurning || antCrushed) ? 0 : Math.sin(animT * 4.0) * 3.5;
+  const tilt = (antTurning || antCrushed) ? 0 : Math.sin(animT * 4.0) * 0.025;
 
   // Shadow
   ctx.save();
@@ -635,9 +654,34 @@ function drawAnt(cw, ch) {
   ctx.save();
   ctx.translate(antX, antY - antH / 2 + bob);
   ctx.rotate(tilt);
-  if (!antTurning && antVx > 0) ctx.scale(-1, 1);
+  if (!antTurning && !antCrushed && antVx > 0) ctx.scale(-1, 1);
   ctx.drawImage(drawImg, -antW / 2, -antH / 2, antW, antH);
   ctx.restore();
+}
+
+// ────────────────────────────────────────
+//  ANT TAP (crush)
+// ────────────────────────────────────────
+canvas.addEventListener('click', onCanvasTap);
+canvas.addEventListener('touchend', e => { e.preventDefault(); onCanvasTap(e.changedTouches[0]); }, { passive: false });
+
+function onCanvasTap(e) {
+  if (appState !== 'placed') return;
+  if (!antTurning || antCrushed) return;
+
+  const rect = canvas.getBoundingClientRect();
+  const tx = (e.clientX - rect.left) * (canvas.width  / rect.width);
+  const ty = (e.clientY - rect.top)  * (canvas.height / rect.height);
+
+  const antW = canvas.width * 0.55;
+  const antH = antW * (antFrontImg.naturalHeight / antFrontImg.naturalWidth || 1);
+  const left = antX - antW / 2;
+  const top  = antY - antH;
+
+  if (tx >= left && tx <= left + antW && ty >= top && ty <= top + antH) {
+    antCrushed = true;
+    antCrushStartTime = Date.now();
+  }
 }
 
 // ────────────────────────────────────────
