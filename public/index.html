@@ -204,17 +204,14 @@ html, body {
   border-color: rgba(136,255,85,0.7) !important;
   box-shadow: 0 0 18px rgba(136,255,85,0.25);
 }
-.result-btns { display: flex; gap: 14px; width: 100%; max-width: 360px; }
+.result-btns { display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 320px; }
 .result-btns button {
-  flex: 1; padding: 15px 0;
-  border-radius: 40px;
-  font-family: inherit; font-weight: 800;
-  font-size: 13px; letter-spacing: 2px;
-  cursor: pointer; border: 2px solid;
+  background: none; border: none;
+  padding: 0; cursor: pointer;
+  transition: transform 0.1s, opacity 0.1s;
 }
-#btn-share { background: rgba(50,110,28,0.85); border-color: #88ff55; color: #fff; }
-#btn-retake { background: transparent; border-color: rgba(136,255,85,0.4); color: #88ff55; }
-#btn-save { background: rgba(20,60,80,0.85); border-color: rgba(100,200,255,0.5); color: #aef; font-size: 11px; }
+.result-btns button:active { transform: scale(0.95); opacity: 0.8; }
+.result-btns button img { width: 100%; height: auto; display: block; }
 </style>
 </head>
 <body>
@@ -262,9 +259,9 @@ html, body {
   <span class="result-label">撮影完了<small>SCAN COMPLETE</small></span>
   <img id="captured-img" alt="撮影した写真">
   <div class="result-btns">
-    <button id="btn-share">シェア<br><small style="font-size:9px;letter-spacing:2px;opacity:0.8">SHARE</small></button>
-    <button id="btn-save">写真保存<br><small style="font-size:9px;letter-spacing:2px;opacity:0.8">PHOTO SAVE</small></button>
-    <button id="btn-retake">再撮影<br><small style="font-size:9px;letter-spacing:2px;opacity:0.8">RETAKE</small></button>
+    <button id="btn-share"><img src="/btn_share.png" alt="シェア"></button>
+    <button id="btn-save"><img src="/btn_save.png" alt="写真保存"></button>
+    <button id="btn-retake"><img src="/btn_retake.png" alt="再撮影"></button>
   </div>
 </div>
 
