@@ -613,7 +613,7 @@ function drawAnt(cw, ch) {
 
   // Turning: wait, then flip direction
   if (antTurning) {
-    if (Date.now() - antTurnStartTime >= ANT_TURN_MS) {
+    if (!antCrushed && Date.now() - antTurnStartTime >= ANT_TURN_MS) {
       antTurning = false;
       antVx = antPendingVx;
     }
