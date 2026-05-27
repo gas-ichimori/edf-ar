@@ -231,12 +231,28 @@ let capturedBlob = null;
 let groundCX = 0, groundCY = 0;
 
 // ── Images ──
-const antImg   = new Image(); let antLoaded   = false;
 const frameImg = new Image(); let frameLoaded = false;
-antImg.onload   = () => { antLoaded   = true; };
 frameImg.onload = () => { frameLoaded = true; $('frame-overlay').style.display = 'block'; };
-antImg.src   = '/ant.png';
 frameImg.src = '/frame.png';
+
+// ── Ant frames ──
+const ANT_FRAME_COUNT  = 4;
+const ANT_FRAME_MS     = 130; // ms per frame
+const antFrames        = [];
+let antFramesLoaded    = 0;
+let antLoaded          = false;
+let antImg             = null; // current frame reference (for placing animation)
+let lastFrameSwitch    = 0;
+let currentAntFrame    = 0;
+for (let i = 1; i <= ANT_FRAME_COUNT; i++) {
+  const img = new Image();
+  img.onload = () => {
+    antFramesLoaded++;
+    if (antFramesLoaded === ANT_FRAME_COUNT) { antLoaded = true; antImg = antFrames[0]; }
+  };
+  img.src = `/ant${i}.png`;
+  antFrames.push(img);
+}
 
 // ────────────────────────────────────────
 //  START
@@ -548,11 +564,22 @@ function drawPlacing(cw, ch) {
 // ────────────────────────────────────────
 //  ANT WALK
 // ────────────────────────────────────────
+function advanceAntFrame() {
+  const now = Date.now();
+  if (now - lastFrameSwitch >= ANT_FRAME_MS) {
+    currentAntFrame = (currentAntFrame + 1) % ANT_FRAME_COUNT;
+    antImg = antFrames[currentAntFrame];
+    lastFrameSwitch = now;
+  }
+}
+
 function drawAnt(cw, ch) {
   if (!antLoaded) return;
 
-  const antW  = cw * 0.55;
-  const antH  = antW * (antImg.naturalHeight / antImg.naturalWidth);
+  advanceAntFrame();
+
+  const antW   = cw * 0.55;
+  const antH   = antW * (antImg.naturalHeight / antImg.naturalWidth);
   const margin = antW * 0.3;
 
   antX += antVx;
