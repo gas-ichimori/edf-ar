@@ -32,10 +32,11 @@ html, body {
   background: rgba(0,0,0,0.45);
 }
 #start-copyright {
-  position: absolute; bottom: 20px; left: 0; right: 0;
+  position: absolute; bottom: 10px; left: 0; right: 0;
   text-align: center;
-  font-size: 10px; letter-spacing: 1px;
-  color: rgba(255,255,255,0.5);
+  font-size: 9px; letter-spacing: 1px;
+  font-family: 'M PLUS 1p', sans-serif; font-weight: 800;
+  color: rgba(255,255,255,0.45);
   z-index: 1;
 }
 #start-screen h1, #start-screen p, #btn-start {
@@ -526,10 +527,10 @@ function renderLoop() {
 
   // Copyright
   ctx.save();
-  ctx.font = '10px sans-serif';
+  ctx.font = 'bold 10px sans-serif';
   ctx.textAlign = 'center';
-  ctx.fillStyle = 'rgba(255,255,255,0.45)';
-  ctx.fillText('© D3PUBLISHER INC. All rights reserved.', cw / 2, ch - 10);
+  ctx.fillStyle = 'rgba(255,255,255,0.6)';
+  ctx.fillText('© D3PUBLISHER INC. All rights reserved.', cw / 2, ch - 52);
   ctx.restore();
 }
 
