@@ -219,7 +219,7 @@ const PLACING_DURATION = 900; // ms
 let placingStartTime = 0;
 
 // ── Ant walk ──
-let antX = 0, antY = 0, antVx = 0.55;
+let antX = 0, antY = 0, antVx = -0.55;
 
 // ── Animation timer ──
 let animT  = 0;
@@ -352,7 +352,7 @@ function triggerPlacement() {
   if (appState === 'placing' || appState === 'placed') return;
   const cw = canvas.width, ch = canvas.height;
   groundCX = cw / 2;
-  groundCY = ch * 0.68;
+  groundCY = ch * 0.80;
   antX = groundCX;
   antY = groundCY;
   placingStartTime = Date.now();
@@ -410,7 +410,7 @@ function renderLoop() {
 // ────────────────────────────────────────
 function drawScanIndicator(cw, ch) {
   const cx = cw / 2;
-  const cy = ch * 0.68;
+  const cy = ch * 0.80;
   const gw = cw * 0.52;
   const gh = ch * 0.075;
 
