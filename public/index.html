@@ -241,7 +241,7 @@ const ANT_FRAME_MS     = 130; // ms per frame
 const antFrames        = [];
 let antFramesLoaded    = 0;
 let antLoaded          = false;
-let antImg             = null; // current frame reference (for placing animation)
+let antImg             = null;
 let lastFrameSwitch    = 0;
 let currentAntFrame    = 0;
 for (let i = 1; i <= ANT_FRAME_COUNT; i++) {
@@ -253,6 +253,17 @@ for (let i = 1; i <= ANT_FRAME_COUNT; i++) {
   img.src = `/ant${i}.png`;
   antFrames.push(img);
 }
+
+// ── Front-facing (turn) frame ──
+const antFrontImg = new Image(); let antFrontLoaded = false;
+antFrontImg.onload = () => { antFrontLoaded = true; };
+antFrontImg.src = '/ant_front.png';
+
+// ── Turning state ──
+let antTurning       = false;
+let antTurnStartTime = 0;
+let antPendingVx     = 0;
+const ANT_TURN_MS    = 420;
 
 // ────────────────────────────────────────
 //  START
@@ -576,18 +587,40 @@ function advanceAntFrame() {
 function drawAnt(cw, ch) {
   if (!antLoaded) return;
 
-  advanceAntFrame();
-
   const antW   = cw * 0.55;
   const antH   = antW * (antImg.naturalHeight / antImg.naturalWidth);
   const margin = antW * 0.3;
 
-  antX += antVx;
-  if (antX - antW / 2 < margin)      { antX = margin + antW / 2;      antVx =  Math.abs(antVx); }
-  if (antX + antW / 2 > cw - margin) { antX = cw - margin - antW / 2; antVx = -Math.abs(antVx); }
+  // Turning: wait, then flip direction
+  if (antTurning) {
+    if (Date.now() - antTurnStartTime >= ANT_TURN_MS) {
+      antTurning = false;
+      antVx = antPendingVx;
+    }
+  } else {
+    antX += antVx;
+    if (antX - antW / 2 < margin) {
+      antX = margin + antW / 2;
+      antTurning = true; antTurnStartTime = Date.now();
+      antPendingVx = Math.abs(antVx);
+    } else if (antX + antW / 2 > cw - margin) {
+      antX = cw - margin - antW / 2;
+      antTurning = true; antTurnStartTime = Date.now();
+      antPendingVx = -Math.abs(antVx);
+    }
+  }
 
-  const bob  = Math.sin(animT * 4.0) * 3.5;
-  const tilt = Math.sin(animT * 4.0) * 0.025;
+  // Choose image: front while turning, walking frames otherwise
+  let drawImg;
+  if (antTurning && antFrontLoaded) {
+    drawImg = antFrontImg;
+  } else {
+    advanceAntFrame();
+    drawImg = antImg;
+  }
+
+  const bob  = antTurning ? 0 : Math.sin(animT * 4.0) * 3.5;
+  const tilt = antTurning ? 0 : Math.sin(animT * 4.0) * 0.025;
 
   // Shadow
   ctx.save();
@@ -602,8 +635,8 @@ function drawAnt(cw, ch) {
   ctx.save();
   ctx.translate(antX, antY - antH / 2 + bob);
   ctx.rotate(tilt);
-  if (antVx > 0) ctx.scale(-1, 1);
-  ctx.drawImage(antImg, -antW / 2, -antH / 2, antW, antH);
+  if (!antTurning && antVx > 0) ctx.scale(-1, 1);
+  ctx.drawImage(drawImg, -antW / 2, -antH / 2, antW, antH);
   ctx.restore();
 }
 
