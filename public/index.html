@@ -34,7 +34,7 @@ html, body {
 #start-copyright {
   position: absolute; bottom: 10px; left: 0; right: 0;
   text-align: center;
-  font-size: 9px; letter-spacing: 3px;
+  font-size: 8px; letter-spacing: 3px;
   font-family: 'M PLUS 1p', sans-serif; font-weight: 800;
   color: rgba(200,240,160,0.6);
   z-index: 1;
@@ -314,6 +314,7 @@ let animT  = 0;
 let rafId  = null;
 let video  = null;
 let capturedBlob = null;
+let saveBlob = null;
 
 // ── Ground indicator anchor (set when stabilised) ──
 let groundCX = 0, groundCY = 0;
@@ -792,12 +793,25 @@ $('btn-capture').addEventListener('click', () => {
   $('flash').classList.add('on');
   setTimeout(() => $('flash').classList.remove('on'), 120);
   cancelAnimationFrame(rafId);
+
+  // 表示用（著作権なし）
   canvas.toBlob(blob => {
     capturedBlob = blob;
     $('captured-img').src = URL.createObjectURL(blob);
     $('ar-view').style.display = 'none';
     $('result-screen').style.display = 'flex';
   }, 'image/jpeg', 0.92);
+
+  // 保存用（著作権あり）— 撮影時のcanvasに直接合成
+  const sc = document.createElement('canvas');
+  sc.width = canvas.width; sc.height = canvas.height;
+  const sctx = sc.getContext('2d');
+  sctx.drawImage(canvas, 0, 0);
+  sctx.font = 'bold 11px sans-serif';
+  sctx.textAlign = 'center';
+  sctx.fillStyle = 'rgba(255,255,255,0.65)';
+  sctx.fillText('© D3PUBLISHER INC. All rights reserved.', sc.width / 2, sc.height - 20);
+  sc.toBlob(blob => { saveBlob = blob; }, 'image/jpeg', 0.92);
 });
 
 // ── Share ──
@@ -814,25 +828,14 @@ $('btn-share').addEventListener('click', async () => {
 // ── Save ──
 $('btn-save').addEventListener('click', downloadPhoto);
 function downloadPhoto() {
-  if (!capturedBlob) return;
-  const srcImg = $('captured-img');
-  const off = document.createElement('canvas');
-  off.width  = srcImg.naturalWidth  || canvas.width;
-  off.height = srcImg.naturalHeight || canvas.height;
-  const octx = off.getContext('2d');
-  octx.drawImage(srcImg, 0, 0, off.width, off.height);
-  octx.font = 'bold 11px sans-serif';
-  octx.textAlign = 'center';
-  octx.fillStyle = 'rgba(255,255,255,0.65)';
-  octx.fillText('© D3PUBLISHER INC. All rights reserved.', off.width / 2, off.height - 20);
-  off.toBlob(blob => {
-    const count = (parseInt(localStorage.getItem('edf-ar-count') || '0') + 1);
-    localStorage.setItem('edf-ar-count', count);
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = `edf-ar-${count}.jpg`;
-    a.click();
-  }, 'image/jpeg', 0.92);
+  const blob = saveBlob || capturedBlob;
+  if (!blob) return;
+  const count = (parseInt(localStorage.getItem('edf-ar-count') || '0') + 1);
+  localStorage.setItem('edf-ar-count', count);
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `edf-ar-${count}.jpg`;
+  a.click();
 }
 
 // ── Retake ──
