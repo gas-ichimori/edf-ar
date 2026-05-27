@@ -192,7 +192,18 @@ html, body {
   border: 2px solid rgba(200,168,50,0.5);
   border-radius: 12px;
 }
-.result-label { font-size: 11px; letter-spacing: 3px; color: #c8a832; }
+.result-label {
+  font-size: 11px; letter-spacing: 3px; color: #88ff55;
+  text-align: center; line-height: 2;
+}
+.result-label small {
+  display: block; font-size: 9px; letter-spacing: 4px;
+  color: rgba(136,255,85,0.7);
+}
+#captured-img {
+  border-color: rgba(136,255,85,0.7) !important;
+  box-shadow: 0 0 18px rgba(136,255,85,0.25);
+}
 .result-btns { display: flex; gap: 14px; width: 100%; max-width: 360px; }
 .result-btns button {
   flex: 1; padding: 15px 0;
@@ -201,8 +212,8 @@ html, body {
   font-size: 13px; letter-spacing: 2px;
   cursor: pointer; border: 2px solid;
 }
-#btn-share { background: rgba(50,110,28,0.85); border-color: #c8a832; color: #fff; }
-#btn-retake { background: transparent; border-color: rgba(200,168,50,0.4); color: #c8a832; }
+#btn-share { background: rgba(50,110,28,0.85); border-color: #88ff55; color: #fff; }
+#btn-retake { background: transparent; border-color: rgba(136,255,85,0.4); color: #88ff55; }
 #btn-save { background: rgba(20,60,80,0.85); border-color: rgba(100,200,255,0.5); color: #aef; font-size: 11px; }
 </style>
 </head>
@@ -248,12 +259,12 @@ html, body {
 <div id="flash"></div>
 
 <div id="result-screen">
-  <span class="result-label">撮影完了</span>
+  <span class="result-label">撮影完了<small>SCAN COMPLETE</small></span>
   <img id="captured-img" alt="撮影した写真">
   <div class="result-btns">
-    <button id="btn-share">📤 シェア</button>
-    <button id="btn-save">⬇️ 保存</button>
-    <button id="btn-retake">↩ 撮り直す</button>
+    <button id="btn-share">シェア<br><small style="font-size:9px;letter-spacing:2px;opacity:0.8">SHARE</small></button>
+    <button id="btn-save">写真保存<br><small style="font-size:9px;letter-spacing:2px;opacity:0.8">PHOTO SAVE</small></button>
+    <button id="btn-retake">再撮影<br><small style="font-size:9px;letter-spacing:2px;opacity:0.8">RETAKE</small></button>
   </div>
 </div>
 
@@ -797,9 +808,11 @@ $('btn-share').addEventListener('click', async () => {
 $('btn-save').addEventListener('click', downloadPhoto);
 function downloadPhoto() {
   if (!capturedBlob) return;
+  const count = (parseInt(localStorage.getItem('edf-ar-count') || '0') + 1);
+  localStorage.setItem('edf-ar-count', count);
   const a = document.createElement('a');
   a.href = URL.createObjectURL(capturedBlob);
-  a.download = 'edf-ar.jpg';
+  a.download = `edf-ar-${count}.jpg`;
   a.click();
 }
 
