@@ -34,9 +34,9 @@ html, body {
 #start-copyright {
   position: absolute; bottom: 10px; left: 0; right: 0;
   text-align: center;
-  font-size: 9px; letter-spacing: 1px;
+  font-size: 9px; letter-spacing: 3px;
   font-family: 'M PLUS 1p', sans-serif; font-weight: 800;
-  color: rgba(255,255,255,0.45);
+  color: rgba(200,240,160,0.6);
   z-index: 1;
 }
 #start-screen h1, #start-screen p, #btn-start {
@@ -815,26 +815,24 @@ $('btn-share').addEventListener('click', async () => {
 $('btn-save').addEventListener('click', downloadPhoto);
 function downloadPhoto() {
   if (!capturedBlob) return;
-  const img = new Image();
-  img.onload = () => {
-    const off = document.createElement('canvas');
-    off.width = img.width; off.height = img.height;
-    const octx = off.getContext('2d');
-    octx.drawImage(img, 0, 0);
-    octx.font = 'bold 11px sans-serif';
-    octx.textAlign = 'center';
-    octx.fillStyle = 'rgba(255,255,255,0.6)';
-    octx.fillText('© D3PUBLISHER INC. All rights reserved.', off.width / 2, off.height - 20);
-    off.toBlob(blob => {
-      const count = (parseInt(localStorage.getItem('edf-ar-count') || '0') + 1);
-      localStorage.setItem('edf-ar-count', count);
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = `edf-ar-${count}.jpg`;
-      a.click();
-    }, 'image/jpeg', 0.92);
-  };
-  img.src = URL.createObjectURL(capturedBlob);
+  const srcImg = $('captured-img');
+  const off = document.createElement('canvas');
+  off.width  = srcImg.naturalWidth  || canvas.width;
+  off.height = srcImg.naturalHeight || canvas.height;
+  const octx = off.getContext('2d');
+  octx.drawImage(srcImg, 0, 0, off.width, off.height);
+  octx.font = 'bold 11px sans-serif';
+  octx.textAlign = 'center';
+  octx.fillStyle = 'rgba(255,255,255,0.65)';
+  octx.fillText('© D3PUBLISHER INC. All rights reserved.', off.width / 2, off.height - 20);
+  off.toBlob(blob => {
+    const count = (parseInt(localStorage.getItem('edf-ar-count') || '0') + 1);
+    localStorage.setItem('edf-ar-count', count);
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `edf-ar-${count}.jpg`;
+    a.click();
+  }, 'image/jpeg', 0.92);
 }
 
 // ── Retake ──
