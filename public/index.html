@@ -815,10 +815,9 @@ function downloadPhoto() {
 
 // ── Retake ──
 $('btn-retake').addEventListener('click', () => {
-  appState = 'scanning';
-  stillDuration = 0;
   $('result-screen').style.display = 'none';
   $('ar-view').style.display = 'block';
+  appState = 'placed';
   rafId = requestAnimationFrame(renderLoop);
 });
 </script>
