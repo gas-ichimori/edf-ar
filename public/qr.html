@@ -6,7 +6,7 @@
 <title>EDF AR — 巨大蟻出現</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=M+PLUS+1p:wght@800&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html, body {
@@ -18,7 +18,6 @@ html, body {
   overflow: hidden;
 }
 
-/* ── 背景 ── */
 #bg {
   position: fixed; inset: 0;
   background: url('/bg.png') center center / cover no-repeat;
@@ -30,14 +29,12 @@ html, body {
   background: rgba(0,0,0,0.52);
 }
 
-/* ── レイアウト ── */
 #wrap {
   position: relative; z-index: 1;
   width: 100%; height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0;
 }
 
 /* 左カラム */
@@ -45,8 +42,8 @@ html, body {
   flex: 1;
   display: flex; flex-direction: column;
   align-items: center; justify-content: center;
-  gap: 28px;
-  padding: 40px 60px;
+  gap: 36px;
+  padding: 40px 80px;
 }
 
 /* 縦区切り */
@@ -61,11 +58,11 @@ html, body {
   flex: 0 0 420px;
   display: flex; flex-direction: column;
   align-items: center; justify-content: center;
-  gap: 28px;
+  gap: 32px;
   padding: 40px 60px;
 }
 
-/* ── ロゴスイッチャー ── */
+/* ロゴスイッチャー */
 #logo-switcher {
   position: relative;
   width: 200px; height: 80px;
@@ -80,82 +77,55 @@ html, body {
 }
 #logo-switcher img.active { opacity: 1; }
 
-/* ── タイトル ── */
-#title {
-  text-align: center;
-}
+/* タイトル */
+#title { text-align: center; }
 #title h1 {
-  font-size: 52px; letter-spacing: 10px; color: #c8a832;
+  font-size: 56px; letter-spacing: 10px; color: #c8a832;
   line-height: 1.2;
   text-shadow: 0 2px 20px rgba(0,0,0,0.9);
 }
 #title .warning {
-  display: block; margin-top: 8px;
-  font-size: 13px; letter-spacing: 4px; color: #ff4444;
+  display: block; margin-top: 10px;
+  font-size: 14px; letter-spacing: 4px; color: #ff4444;
   text-shadow: 0 0 12px rgba(255,60,60,0.7);
   animation: blink 1.4s infinite;
 }
 @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.4} }
 
-/* ── テキストブロック ── */
+/* テキストブロック */
 .text-block { text-align: center; }
 .text-block .ja {
-  font-size: 22px; letter-spacing: 4px; color: #dff0d0;
+  font-size: 26px; letter-spacing: 4px; color: #dff0d0;
   text-shadow: 0 1px 10px rgba(0,0,0,0.9);
-  line-height: 1.6;
+  line-height: 1.7;
 }
 .text-block .en {
-  display: block; margin-top: 6px;
-  font-size: 11px; letter-spacing: 3px; color: rgba(200,168,50,0.85);
+  display: block; margin-top: 8px;
+  font-size: 12px; letter-spacing: 3px; color: rgba(200,168,50,0.85);
 }
 
-/* ── マーク + カメラ起動 ── */
-#launch-block {
-  display: flex; flex-direction: column;
-  align-items: center; gap: 10px;
-}
-#launch-block img {
-  width: 80px; height: 80px; object-fit: contain;
-  filter: drop-shadow(0 0 16px rgba(200,168,50,0.7));
-}
-#launch-block .launch-ja {
-  font-size: 20px; letter-spacing: 5px; color: #fff;
-  text-shadow: 0 2px 10px rgba(0,0,0,0.9);
-}
-#launch-block .launch-en {
-  font-size: 10px; letter-spacing: 3px; color: rgba(200,240,160,0.8);
-}
-
-/* ── 右カラム ── */
-#join-label {
-  text-align: center;
-}
+/* 右カラム */
+#join-label { text-align: center; }
 #join-label .ja {
-  font-size: 32px; letter-spacing: 6px; color: #88ff55;
+  font-size: 36px; letter-spacing: 6px; color: #88ff55;
   text-shadow: 0 0 20px rgba(136,255,85,0.5);
 }
 #join-label .en {
-  display: block; margin-top: 4px;
-  font-size: 11px; letter-spacing: 4px; color: rgba(136,255,85,0.7);
+  display: block; margin-top: 6px;
+  font-size: 12px; letter-spacing: 4px; color: rgba(136,255,85,0.7);
 }
 
 /* QRコード */
 #qr-wrap {
   background: #fff;
-  padding: 18px;
+  padding: 20px;
   border-radius: 12px;
   border: 3px solid rgba(136,255,85,0.6);
-  box-shadow: 0 0 30px rgba(136,255,85,0.2);
+  box-shadow: 0 0 30px rgba(136,255,85,0.25);
 }
-#qr-canvas { display: block; }
+#qr-wrap img, #qr-wrap canvas { display: block; }
 
-#qr-url {
-  font-size: 11px; letter-spacing: 2px;
-  color: rgba(200,240,160,0.6);
-  text-align: center;
-}
-
-/* ── 著作権 ── */
+/* 著作権 */
 #copyright {
   position: fixed; bottom: 12px; left: 0; right: 0;
   text-align: center;
@@ -171,9 +141,7 @@ html, body {
 
 <div id="wrap">
 
-  <!-- 左カラム -->
   <div id="col-left">
-
     <div id="logo-switcher">
       <img src="/logo3.png" alt="EDF 5" class="active">
       <img src="/logo2.png" alt="EDF 6">
@@ -186,40 +154,22 @@ html, body {
     </div>
 
     <div class="text-block">
-      <p class="ja">カメラを起動して<br>地面を認識させろ！</p>
-      <span class="en">ACTIVATE CAMERA. SCAN THE GROUND.</span>
-    </div>
-
-    <div class="text-block">
       <p class="ja">ARスキャンで<br>巨大蟻を発見せよ！</p>
       <span class="en">DISCOVER GIANT ANTS WITH AR SCAN.</span>
     </div>
-
-    <div id="launch-block">
-      <img src="/mark.png" alt="EDF">
-      <span class="launch-ja">カメラ起動</span>
-      <span class="launch-en">ACTIVATE CAMERA</span>
-    </div>
-
   </div>
 
-  <!-- 縦区切り線 -->
   <div id="divider"></div>
 
-  <!-- 右カラム -->
   <div id="col-right">
-
     <div id="join-label">
       <p class="ja">今すぐ参戦！</p>
       <span class="en">JOIN THE BATTLE NOW!</span>
     </div>
 
     <div id="qr-wrap">
-      <canvas id="qr-canvas"></canvas>
+      <div id="qr-code"></div>
     </div>
-
-    <p id="qr-url">edf-ar.onrender.com</p>
-
   </div>
 
 </div>
@@ -227,14 +177,15 @@ html, body {
 <p id="copyright">© D3PUBLISHER INC. All rights reserved.</p>
 
 <script>
-// QRコード生成
-QRCode.toCanvas(
-  document.getElementById('qr-canvas'),
-  'https://edf-ar.onrender.com',
-  { width: 260, margin: 1, color: { dark: '#000000', light: '#ffffff' } }
-);
+new QRCode(document.getElementById('qr-code'), {
+  text: 'https://edf-ar.onrender.com',
+  width: 280,
+  height: 280,
+  colorDark: '#000000',
+  colorLight: '#ffffff',
+  correctLevel: QRCode.CorrectLevel.H
+});
 
-// ロゴスイッチャー
 (function() {
   const logos = document.querySelectorAll('#logo-switcher img');
   let current = 0;
