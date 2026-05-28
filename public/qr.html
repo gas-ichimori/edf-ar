@@ -33,33 +33,11 @@ html, body {
   position: relative; z-index: 1;
   width: 100%; height: 100vh;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-}
-
-/* 左カラム */
-#col-left {
-  flex: 1;
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  gap: 36px;
-  padding: 40px 80px;
-}
-
-/* 縦区切り */
-#divider {
-  width: 1px; height: 70vh;
-  background: linear-gradient(to bottom,
-    transparent, rgba(200,168,50,0.5) 20%, rgba(200,168,50,0.5) 80%, transparent);
-}
-
-/* 右カラム */
-#col-right {
-  flex: 0 0 420px;
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
   gap: 32px;
-  padding: 40px 60px;
+  padding: 40px;
 }
 
 /* ロゴスイッチャー */
@@ -141,35 +119,29 @@ html, body {
 
 <div id="wrap">
 
-  <div id="col-left">
-    <div id="logo-switcher">
-      <img src="/logo3.png" alt="EDF 5" class="active">
-      <img src="/logo2.png" alt="EDF 6">
-      <img src="/logo1.png" alt="EDF 6.1">
-    </div>
-
-    <div id="title">
-      <h1>巨大蟻出現</h1>
-      <span class="warning">⚠ WARNING: GIANT ANTS DETECTED</span>
-    </div>
-
-    <div class="text-block">
-      <p class="ja">ARスキャンで<br>巨大蟻を発見せよ！</p>
-      <span class="en">DISCOVER GIANT ANTS WITH AR SCAN.</span>
-    </div>
+  <div id="logo-switcher">
+    <img src="/logo3.png" alt="EDF 5" class="active">
+    <img src="/logo2.png" alt="EDF 6">
+    <img src="/logo1.png" alt="EDF 6.1">
   </div>
 
-  <div id="divider"></div>
+  <div id="title">
+    <h1>巨大蟻出現</h1>
+    <span class="warning">⚠ WARNING: GIANT ANTS DETECTED</span>
+  </div>
 
-  <div id="col-right">
-    <div id="join-label">
-      <p class="ja">今すぐ参戦！</p>
-      <span class="en">JOIN THE BATTLE NOW!</span>
-    </div>
+  <div class="text-block">
+    <p class="ja">ARスキャンで巨大蟻を発見せよ！</p>
+    <span class="en">DISCOVER GIANT ANTS WITH AR SCAN.</span>
+  </div>
 
-    <div id="qr-wrap">
-      <div id="qr-code"></div>
-    </div>
+  <div id="join-label">
+    <p class="ja">今すぐ参戦！</p>
+    <span class="en">JOIN THE BATTLE NOW!</span>
+  </div>
+
+  <div id="qr-wrap">
+    <div id="qr-code"></div>
   </div>
 
 </div>
